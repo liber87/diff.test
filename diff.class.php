@@ -1,142 +1,66 @@
-<?php
-class Diff {
-	
-	public $step_empty; //Пропущенно шагов
-	
-	public $text1; //Первый текст
-	
-	public $size1; //Размер первого массива
-	
-	public $text2; //Второй текст
-	
-	public $text_result; //Результирующий массив
-	
-	public $bad_index; //Индекс, когда ничего не находим
-	
-	public $statuses; //Цвета
-	
-	
-	/*Логика скрипта*/
-	function __construct($text1 = '',$text2 = '', $sep = 'nr')
-	{
-		$this->text1 = $this->getArray($text1,$sep);
-		$this->text2 = $this->getArray($text2,$sep);
-		$this->bad_index = -1;
-		$this->statuses = ['equal'=>'white','old'=>'danger','new'=>'success','change'=>'warning'];
+<!doctype html>
+<html lang="ru">
+	<head>		
+		<meta charset="utf-8">		
+		<meta name="viewport" content="width=device-width, initial-scale=1">		
+		<title>Сравнение двух текстов</title>						
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+		<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>		
+		<style>.last{position: absolute; background: lightgrey; opacity:0.6; display:none;}td:hover .last{display:block;}td{cursor:pointer;}.span-danger{color: #721c24;background-color: #f8d7da;}.span-success{color: #155724;background-color: #d4edda;}.span-warning, .span-warning a{color: #856404; background-color: #fff3cd; text-decoration:none;}span{display:inline-block;}</style>
 		
 		
-		foreach($this->text2 as $k2 => $t2)
-		{			
-			$t2 = $this->stripWhitespaces($t2);
-			$this->size1 = count($this->text1)-1;
-			foreach($this->text1 as $k => $t1)
-			{				
-				$t1 = $this->stripWhitespaces($t1);
-				//Проверяем три состояния: полное совпадение, частичное и полное несовпадение				
-				
-				//Полное совпадение
-				if ($t1==$t2){				
-					$this->text_result[] = ['status'=>'equal','text'=>$t1];
-					$this->checkFirstText($k);
-					break;
-				}
-				
-				//Проверяем схожесть строк 
-				similar_text($t1, $t2, $perc);
-				
-				//Если почти похожи
-				if (($perc>=50) && ($perc<100)){	
-					$this->text_result[] = ['status'=>'change','text'=>$t2,'last'=>$t1,'perc'=>$perc];
-					$this->checkFirstText($k);
-					break;
-				}
-				
-				//Прошли весь массив и не нашли что искали
-				if ($k==$this->size1){
-					$this->text_result[] = ['status'=>'new','text'=>$t2];	
-					if ($this->bad_index==-1) $this->bad_index = $k2+1;
-				}
-			}
-		}
-		if (count($this->text1)) foreach($this->text1 as $t) $this->text_result[] = ['status'=>'old','text'=>$t];
-	}	
-	
-	
-	/*Убираем непечатыемы символы*/
-	function stripWhitespaces($string) 
-	{
-		return preg_replace('/[\x00-\x1F\x7F]/u', '', $string);
-	}
-	
-	
-	/*Разбиваем текст на массив строк*/
-	function getArray($text,$sep)
-	{
-		if ($sep=='nr') return explode(PHP_EOL,$text);
-		else {
-			$text = str_replace(['.','?','!'],['.|||','?|||','!|||'],$text);
-			return explode('|||',$text);
-		}
-	}
-	
-	
-	/*Производим манипуляции с первым текстом*/
-	function checkFirstText($k)
-	{		
-		unset($this->text1[$k]);		
-		if ($k>0){
-			$tmp = [];
-			for($i=0;$i<$k;$i++){
-				$tmp[] = ['status'=>'old','text'=>$this->text1[$i]];
-				unset($this->text1[$i]);
-			}						
-			array_splice($this->text_result, $this->bad_index, 0, $tmp);			
-		}
-		$this->text1 = $this->repairArray($this->text1);
-		$this->bad_index=-1;
-	}
-	
-	
-	//Сбрасываем индексы
-	function repairArray($arr)
-	{		
-		if ((!is_array) || (!count($arr))) return [];
-		$tmp = [];		
-		foreach($arr as $t) $tmp[] = $t;
-		return $tmp;
-	}
-	
-	
-	/*Отдаем массив*/
-	function getAnswer()
-	{
-		return $this->text_result;
-	}	
-	
-	
-	//Ответ в виде таблички
-	function getTable()
-	{
-		$result='<h2>Результат:</h2>
-		<table width="100%">';
-		foreach($this->text_result as $str){
-			if (isset($str['last'])) $last = '<div class="last alert alert-default">'.$str['last'].'</div>';
-			else $last = '';
-			$result.= '<tr><td class="alert alert-'.$this->statuses[$str['status']].'">'.$str['text'].$last.'</td></tr>';		
-		}
-		$result.= '</table>';
-		return $result;
-	}
-	
-	//Ответ в виде предложений
-	function getProposals()
-	{
-		$result='<h2>Результат:</h2>
-		<p>';
-		foreach($this->text_result as $str){			
-			$result.= '<span class="span-'.$this->statuses[$str['status']].'"><a title="'.$str['last'].'">'.$str['text'].$last.'</a></span> ';		
-		}
-		$result.= '</p>';
-		return $result;
-	}
-}
+	</head>
+	<body>
+		<div class="container">
+			<form method="post" action="" id="form">
+				<div class="row">
+					<div class="col-xs-12 text-center">
+						<h1>Сравнение двух текстов</h1>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						Сравненивать: 
+						<label><input type="radio" name="compare" value="nr" checked="checked"> построчно</label>
+						<label><input type="radio" name="compare" value="proposal"> по предложениям</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 col-sm-6">
+						<textarea class="form-control" style="height:300px;" name="text1"></textarea>
+					</div>
+					<div class="col-xs-12 col-sm-6">
+						<textarea class="form-control" style="height:300px;" name="text2"></textarea>
+					</div>
+				</div>		
+				<div class="row" style="margin-top:20px;">
+					<div class="col-xs-12 text-center">
+						<button type="submit" class="btn btn-success">Сравнить</button>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12" id="result">
+						
+					</div>
+				</div>
+			</form>
+		</div>
+		<script>
+			document.addEventListener('DOMContentLoaded', function(){
+				$('form').submit(function(e){
+					e.preventDefault;
+					$.ajax({
+						type: 'post',
+						url: './ajax.php',
+						data: $(this).serialize(),					
+						success: function(result){
+							$('#result').html(result);
+						}
+					});
+					return false;
+				});
+			});
+		</script>
+		
+	</body>
+</html>
