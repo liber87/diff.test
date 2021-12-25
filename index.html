@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+	<head>		
+		<meta charset="utf-8">		
+		<meta name="viewport" content="width=device-width, initial-scale=1">		
+		<title>Сравнение двух текстов</title>						
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+		<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>		
+		<style>.last{position: absolute; background: lightgrey; opacity:0.6; display:none;}td:hover .last{display:block;}td{cursor:pointer;}</style>
+		
+		
+	</head>
+	<body>
+		<div class="container">
+			<form method="post" action="" id="form">
+				<div class="row">
+					<div class="col-xs-12 text-center">
+						<h1>Сравнение двух текстов</h1>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 col-sm-6">
+						<textarea class="form-control" style="height:300px;" name="text1"></textarea>
+					</div>
+					<div class="col-xs-12 col-sm-6">
+						<textarea class="form-control" style="height:300px;" name="text2"></textarea>
+					</div>
+				</div>		
+				<div class="row" style="margin-top:20px;">
+					<div class="col-xs-12 text-center">
+						<button type="submit" class="btn btn-success">Сравнить</button>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12" id="result">
+						
+					</div>
+				</div>
+			</form>
+		</div>
+		<script>
+			document.addEventListener('DOMContentLoaded', function(){
+				$('form').submit(function(e){
+					e.preventDefault;
+					$.ajax({
+						type: 'post',
+						url: './ajax.php',
+						data: $(this).serialize(),					
+						success: function(result){
+							$('#result').html(result);
+						}
+					});
+					return false;
+				});
+			});
+		</script>
+		
+	</body>
+</html>
