@@ -1,14 +1,11 @@
 <?php
-/*
-* Класс для сравнения двух текстов
-*/
-
-
 class Diff {
 	
 	public $step_empty; //Пропущенно шагов
 	
-	public $text1; //Первый текст	
+	public $text1; //Первый текст
+	
+	public $size1; //Размер первого массива
 	
 	public $text2; //Второй текст
 	
@@ -20,10 +17,10 @@ class Diff {
 	
 	
 	/*Логика скрипта*/
-	function __construct($text1,$text2)
+	function __construct($text1 = '',$text2 = '', $sep = 'nr')
 	{
-		$this->text1 = $this->getArray($text1);
-		$this->text2 = $this->getArray($text2);
+		$this->text1 = $this->getArray($text1,$sep);
+		$this->text2 = $this->getArray($text2,$sep);
 		$this->bad_index = -1;
 		$this->statuses = ['equal'=>'white','old'=>'danger','new'=>'success','change'=>'warning'];
 		
@@ -73,9 +70,13 @@ class Diff {
 	
 	
 	/*Разбиваем текст на массив строк*/
-	function getArray($text)
+	function getArray($text,$sep)
 	{
-		return explode(PHP_EOL,$text);
+		if ($sep=='nr') return explode(PHP_EOL,$text);
+		else {
+			$text = str_replace(['.','?','!'],['.|||','?|||','!|||'],$text);
+			return explode('|||',$text);
+		}
 	}
 	
 	
@@ -124,6 +125,18 @@ class Diff {
 			$result.= '<tr><td class="alert alert-'.$this->statuses[$str['status']].'">'.$str['text'].$last.'</td></tr>';		
 		}
 		$result.= '</table>';
+		return $result;
+	}
+	
+	//Ответ в виде предложений
+	function getProposals()
+	{
+		$result='<h2>Результат:</h2>
+		<p>';
+		foreach($this->text_result as $str){			
+			$result.= '<span class="span-'.$this->statuses[$str['status']].'"><a title="'.$str['last'].'">'.$str['text'].$last.'</a></span> ';		
+		}
+		$result.= '</p>';
 		return $result;
 	}
 }
