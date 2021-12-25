@@ -6,7 +6,7 @@
 		<title>Сравнение двух текстов</title>						
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
 		<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>		
-		<style>.last{position: absolute; background: lightgrey; opacity:0.6; display:none;}td:hover .last{display:block;}td{cursor:pointer;}</style>
+		<style>.last{position: absolute; background: lightgrey; opacity:0.6; display:none;}td:hover .last{display:block;}td{cursor:pointer;}.span-danger{color: #721c24;background-color: #f8d7da;}.span-success{color: #155724;background-color: #d4edda;}.span-warning, .span-warning a{color: #856404; background-color: #fff3cd; text-decoration:none;}span{display:inline-block;}</style>
 		
 		
 	</head>
@@ -16,6 +16,13 @@
 				<div class="row">
 					<div class="col-xs-12 text-center">
 						<h1>Сравнение двух текстов</h1>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						Сравненивать: 
+						<label><input type="radio" name="compare" value="nr" checked="checked"> построчно</label>
+						<label><input type="radio" name="compare" value="proposal"> по предложениям</label>
 					</div>
 				</div>
 				<div class="row">
