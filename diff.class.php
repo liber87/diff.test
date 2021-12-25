@@ -8,9 +8,7 @@ class Diff {
 	
 	public $step_empty; //Пропущенно шагов
 	
-	public $text1; //Первый текст
-	
-	public $size1; //Размер первого массива
+	public $text1; //Первый текст	
 	
 	public $text2; //Второй текст
 	
